@@ -41,7 +41,11 @@ class ReducibilityDetector(object):
 
     def find_back_edges(self, dom_info):
         back_edges = []
-        for (u,v,_) in self.graph.edges:
+        for edge in self.graph.edges:
+            if len(edge) > 2:
+                u,v = edge[:2]
+            else:
+                u,v = edge
             # If v dominates u, this is a back edge
             if v in dom_info[u]:
                 back_edges.append((u,v))
@@ -50,7 +54,11 @@ class ReducibilityDetector(object):
 
     def find_retreating_edges(self, dfn_info):
         retreating_edges = []
-        for (u,v,_) in self.graph.edges:
+        for edge in self.graph.edges:
+            if len(edge) > 2:
+                u,v = edge[:2]
+            else:
+                u,v = edge
             # If dfn[u] >= dfn[v], this is a retreating edge
             if dfn_info[u] >= dfn_info[v]:
                 retreating_edges.append((u,v))
