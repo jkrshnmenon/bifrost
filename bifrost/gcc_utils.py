@@ -41,11 +41,11 @@ class GCC_Utils(object):
     def _create_temp_dir(self):
         with TemporaryDirectory() as dirpath:
             prevdir = getcwd()
-            logger.debug(f"Creating temporary directory {dirpath}")
+            logger.info(f"Creating temporary directory {dirpath}")
             chdir(expanduser(dirpath))
             yield dirpath
             chdir(prevdir)
-            logger.debug(f"Cleaning up temporary directory {dirpath}")
+            logger.info(f"Cleaning up temporary directory {dirpath}")
     
     def _do_compile(self, filename):
         cmd = self._cc + self._fixed_args + self._pre_args + [filename] + self._post_args
@@ -65,7 +65,7 @@ class GCC_Utils(object):
         """
         for filename in listdir(dirpath):
             if filename.endswith('.dot'):
-                logger.debug(f"Found dot file {filename}")
+                logger.info(f"Found dot file {filename}")
                 yield join(dirpath, filename)
     
     def generate_dot_files(self, filename, use_tmpdir=True):

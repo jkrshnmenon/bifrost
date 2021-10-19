@@ -1,6 +1,8 @@
+import logging
 from networkx import dfs_preorder_nodes
 from networkx.algorithms.dominance import immediate_dominators
 
+logger = logging.getLogger(__name__)
 
 class ReducibilityDetector(object):
     def __init__(self, graph):
@@ -75,14 +77,19 @@ class ReducibilityDetector(object):
         5) Iterate through every retreating edge and check if it is a back edge.
         6) If any retreating edge is not a back edge, graph is irreducible
         """
+        logger.debug("Generating dominance info")
         dom_info = self.generate_dom_info(root)
+        logger.debug("Generating depth-first-number info")
         dfn_info = self.generate_dfn_info(root)
+        logger.debug("Finding back edges")
         back_edges = self.find_back_edges(dom_info)
+        logger.debug("Finding retreating edges")
         retreating_edges = self.find_retreating_edges(dfn_info)
 
         flag = True
         for (u,v) in retreating_edges:
             if (u,v) not in back_edges:
+                logger.info("Found irreducible graph")
                 flag = False
                 break
 
