@@ -1,12 +1,23 @@
 import os
 import sys
 import pdb
+import logging
 import IPython
 import networkx
 
 sys.path.append(os.path.abspath(os.path.join(__file__, '../..')))
 
 from bifrost import DotParser, ReducibilityDetector
+
+LEVEL = logging.ERROR
+
+def setup_loggers(name):
+    formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    logger = logging.getLogger(name)
+    logger.addHandler(handler)
+    logger.setLevel(LEVEL)
 
 def test1():
     parser = DotParser('tests/dotfile_sample.dot')
@@ -64,6 +75,9 @@ def test4():
     assert flag is False
 
 if __name__ == '__main__':
+    setup_loggers('bifrost.gcc_utils')
+    setup_loggers('bifrost.dot_parser')
+    setup_loggers('bifrost.reducibility_detector')
     test1()
     test2()
     test3()
