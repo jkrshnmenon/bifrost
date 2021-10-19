@@ -1,3 +1,4 @@
+from .gcc_utils import GCC_Utils
 from .dot_parser import DotParser
 from .reducibility_detector import ReducibilityDetector
 
