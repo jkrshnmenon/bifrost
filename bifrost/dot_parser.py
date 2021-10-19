@@ -21,6 +21,7 @@ class DotParser(object):
             logger.error(f"File {dot_file} not found")
     
     def _parse_dot_file(self, path: str) -> None:
+        logger.info(f"Parsing dot file {path}")
         graph = read_dot(path)
 
         if len(graph.nodes) > 0:
@@ -33,13 +34,41 @@ class DotParser(object):
         for p in pydot_graph:
             for subgraph in p.get_subgraphs():
                 graph = from_pydot(subgraph)
-                self._graph.append(self._filter_graph(graph))
+                self._graph.append(self._filter_graph_gcc(graph))
+    
+    def _filter_graph_gcc(self, graph: networkx.MultiGraph) -> networkx.MultiGraph:
+        logger.info("Filtering graph")
 
+        duplicate_nodes = [n for n in graph.nodes if n.endswith(':s') or n.endswith(':n')]
+        for x in duplicate_nodes:
+            in_edges = list(graph.in_edges(x))
+            out_edges = list(graph.out_edges(x))
+            actual_node = x.split(':')[0]
+            for src, dst in in_edges:
+                graph.add_edge(src, actual_node)
+                graph.remove_edge(src, x)
+            for src, dst in out_edges:
+                graph.add_edge(actual_node, dst)
+                graph.remove_edge(src, dst)
+            graph.remove_node(x)
+
+        flag = False
+        for (u,v,_) in graph.edges:
+            if 'label' in graph.nodes[u] and graph.nodes[u]['label'].strip("'").strip('"') == 'ENTRY':
+                if 'label' in graph.nodes[v] and graph.nodes[v]['label'].strip("'").strip('"') == 'EXIT':
+                    flag = True
+                    break
+        
+        if flag is True:
+            graph.remove_edge(u,v)
+        
+        return graph
         
     def _filter_graph(self, graph: networkx.MultiGraph) -> networkx.MultiGraph:
         """
         Filter the graph by merging duplicate blocks with the original
         """
+        logger.info("Filtering graph")
         # Roots are identified by 0 incoming edges
         possible_roots = [n for n,d in graph.in_degree() if d == 0 ]
         possible_exits = [n for n,d in graph.out_degree() if d == 0 ]
