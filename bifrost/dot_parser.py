@@ -37,7 +37,7 @@ class DotParser(object):
                 self._graph.append(self._filter_graph_gcc(graph))
     
     def _filter_graph_gcc(self, graph: networkx.MultiGraph) -> networkx.MultiGraph:
-        logger.info("Filtering graph")
+        logger.debug("Filtering graph")
 
         duplicate_nodes = [n for n in graph.nodes if n.endswith(':s') or n.endswith(':n')]
         for x in duplicate_nodes:
@@ -68,7 +68,7 @@ class DotParser(object):
         """
         Filter the graph by merging duplicate blocks with the original
         """
-        logger.info("Filtering graph")
+        logger.debug("Filtering graph")
         # Roots are identified by 0 incoming edges
         possible_roots = [n for n,d in graph.in_degree() if d == 0 ]
         possible_exits = [n for n,d in graph.out_degree() if d == 0 ]

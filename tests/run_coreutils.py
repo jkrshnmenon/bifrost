@@ -1,12 +1,17 @@
+from contextlib import redirect_stderr, redirect_stdout
 import os
 import sys
 import pdb
 import json
 import logging
 
+from progressbar import progressbar
+
 sys.path.append(os.path.abspath(os.path.join(__file__, '../..')))
 
 from bifrost import DotParser, GCC_Utils, ReducibilityDetector
+
+LEVEL = logging.INFO
 
 def setup_loggers(name):
     formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
@@ -14,7 +19,7 @@ def setup_loggers(name):
     handler.setFormatter(formatter)
     logger = logging.getLogger(name)
     logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(LEVEL)
 
 
 def main(command):
@@ -42,7 +47,7 @@ if __name__ == '__main__':
     with open("tests/coreutils_commands.json", "r") as f:
         commands = json.load(f)
     
-    for cmd in commands:
+    for cmd in progressbar(commands, redirect_stderr=True, redirect_stdout=True):
         try:
             main(cmd)
         except:
